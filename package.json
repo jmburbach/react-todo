@@ -12,6 +12,7 @@
     "flux": "^2.1.1",
     "js-cookie": "^2.0.3",
     "microevent": "^1.0.0",
+    "promise": "^7.0.4",
     "react": "^0.13.3"
   },
   "devDependencies": {

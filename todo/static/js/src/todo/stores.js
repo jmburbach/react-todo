@@ -2,13 +2,12 @@ import $ from 'jquery';
 import Model from '../vendor/js-model.js';
 import MicroAction from 'microevent/microevent';
 import TodoDispatcher from './dispatchers.js';
-
-
-const END_POINT = '/api/items';
+//import EndPoints from '../endpoints.js';
+import RestfulAdapter from '../persistence.js';
 
 
 var Todo = Model('todo', function() {
-    this.persistence(Model.REST, END_POINT);
+    this.persistence(RestfulAdapter, 'todos');
 });
 
 TodoDispatcher.register(function(payload) {

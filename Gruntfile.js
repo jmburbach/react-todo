@@ -1,3 +1,5 @@
+var production = (process.env.NODE_ENV === 'production');
+
 module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-webpack-without-server');
     grunt.loadNpmTasks('grunt-contrib-watch');
@@ -9,8 +11,8 @@ module.exports = function(grunt) {
         webpack: {
             options: webpackConfig,
             build: {
-                devtool: 'sourcemap',
-                debug: true
+                devtool: production ? '' : 'source-map',
+                debug: !production
             }
         },
         watch: {

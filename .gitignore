@@ -1,4 +1,5 @@
 node_modules
 *.pyc
 .*.swp
+.build-cache
 todo/db.sqlite3
