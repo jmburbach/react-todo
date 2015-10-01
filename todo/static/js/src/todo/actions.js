@@ -1,23 +1,28 @@
 import TodoDispatcher from './dispatchers.js';
 
 var TodoActions = {
+    ADD: 1,
+    REMOVE: 2,
+    COMPLETE: 3,
+    SET_LABEL: 4,
+
     add: function(label) {
         TodoDispatcher.dispatch({
-            actionType: 'add',
+            actionType: TodoActions.ADD,
             label: label
         });
     },
 
     remove: function(todo) {
         TodoDispatcher.dispatch({
-            actionType: 'delete',
+            actionType: TodoActions.REMOVE,
             todo: todo
         });
     },
 
     complete: function(todo, completed) {
         TodoDispatcher.dispatch({
-            actionType: 'complete',
+            actionType: TodoActions.COMPLETE,
             todo: todo,
             completed: completed
         });
@@ -25,7 +30,7 @@ var TodoActions = {
 
     setLabel: function(todo, label) {
         TodoDispatcher.dispatch({
-            actionType: 'set-label',
+            actionType: TodoActions.SET_LABEL,
             todo: todo,
             label: label
         });

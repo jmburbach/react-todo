@@ -1,27 +1,8 @@
 import $ from 'jquery';
-import Promise from 'promise';
-
-const Endpoints = new Promise(function(resolve, reject) {
-    $.ajax({type: 'GET', url: '/api/', dataType: 'json'})
-        .done(resolve)
-        .fail(reject);
-});
+import {getResourceEndpoint} from './api.js';
 
 
-function getApiEndpoints() {
-    return Endpoints;
-}
-
-
-function getResourceEndpoint(resourceName) {
-    return new Promise(function(resolve, reject) {
-        Endpoints.then(function(endpoints) {
-            resolve(endpoints[resourceName]);
-        }).catch(reject);
-    });
-}
-
-
+/** A more restful interface/adapter for the js-model lib. */
 class RestfulInterface
 {
     constructor(modelClass, resourceName) {
@@ -30,11 +11,29 @@ class RestfulInterface
         this.modelClass.persistence = this;
     }
 
+    /** Return true if given model instance is a new record, otherwise false. */
     newRecord(model) {
         console.log('RestfulInterface.newRecord');
         return !model.id();
     }
 
+    /** Retrieve records from server, create models, pass them to callback. */
+    read(callback) {
+        console.log('RestfulInterface.read');
+        var modelClass = this.modelClass;
+        getResourceEndpoint(this.resourceName).then(function(endpoint) {
+            $.ajax({url: endpoint, type: 'GET', dataType: 'json'})
+                .done(function(response) {
+                    var models = [];
+                    for (let data of response) {
+                        models.push(new modelClass(data));
+                    }
+                    callback(models);
+                });
+        });
+    }
+
+    /** Persist a new record. */
     create(model, callback) {
         console.log('RestfulInterface.create');
         var data = this.serialize(model);
@@ -54,6 +53,7 @@ class RestfulInterface
         });
     }
 
+    /** Persist an existing record. */
     update(model, callback) {
         console.log('RestfulInterface.update');
         $.ajax({
@@ -70,31 +70,7 @@ class RestfulInterface
         });
     }
 
-    read(callback) {
-        console.log('RestfulInterface.read');
-        var modelClass = this.modelClass;
-        getResourceEndpoint(this.resourceName).then(function(endpoint) {
-            $.ajax({url: endpoint, type: 'GET', dataType: 'json'})
-                .done(function(response) {
-                    var models = [];
-                    for (let data of response) {
-                        models.push(new modelClass(data));
-                    }
-                    callback(models);
-                });
-        });
-    }
-
-    save(model, callback) {
-        console.log('RestfulInterface.save');
-        if (this.newRecord(model)) {
-            this.create(model, callback);
-        }
-        else {
-            this.update(model, callback);
-        }
-    }
-
+    /** Delete a record. */
     destroy(model, callback) {
         console.log('RestfulInterface.destroy');
         if (this.newRecord(model)) {
@@ -115,14 +91,24 @@ class RestfulInterface
         }
     }
 
+    /** Serialize model json to string. */
     serialize(model) {
         return JSON.stringify(model.asJSON());
     }
 }
 
 
-function RestfulAdapter(modelClass, resourceName) {
-    return new RestfulInterface(modelClass, resourceName);
+/** Adapter factory function.
+ *
+ * example:
+ *     var Item = Model('item', function() {
+ *         this.persistence(RestfulAdapter('items'));
+ *     });
+ */
+function RestfulAdapter(resourceName) {
+    return function(modelClass) {
+        return new RestfulInterface(modelClass, resourceName);
+    }
 }
 
 export default RestfulAdapter;

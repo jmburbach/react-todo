@@ -47,11 +47,10 @@ class TodoBox extends React.Component {
 
 class TodoList extends React.Component {
     render() {
-        var todoItems = this.props.todos.map(function(todo) {
-            return (
-                <TodoItem key={todo.id()} todo={todo} />
-            )
-        });
+        var todoItems = [];
+        for (let todo of this.props.todos) {
+            todoItems.push(<TodoItem key={todo.id()} todo={todo} />);
+        }
         return (
             <ul className="todo-list">
                 {todoItems}

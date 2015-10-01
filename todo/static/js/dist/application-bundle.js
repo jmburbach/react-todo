@@ -20635,7 +20635,7 @@
 	
 	var _storesJs2 = _interopRequireDefault(_storesJs);
 	
-	var _actionsJs = __webpack_require__(178);
+	var _actionsJs = __webpack_require__(179);
 	
 	var _actionsJs2 = _interopRequireDefault(_actionsJs);
 	
@@ -20708,9 +20708,32 @@
 	    _createClass(TodoList, [{
 	        key: 'render',
 	        value: function render() {
-	            var todoItems = this.props.todos.map(function (todo) {
-	                return _reactReact2['default'].createElement(TodoItem, { key: todo.id(), todo: todo });
-	            });
+	            var todoItems = [];
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
+	
+	            try {
+	                for (var _iterator = this.props.todos[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var todo = _step.value;
+	
+	                    todoItems.push(_reactReact2['default'].createElement(TodoItem, { key: todo.id(), todo: todo }));
+	                }
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator['return']) {
+	                        _iterator['return']();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
+	                }
+	            }
+	
 	            return _reactReact2['default'].createElement(
 	                'ul',
 	                { className: 'todo-list' },
@@ -21332,7 +21355,11 @@
 	
 	var _vendorJsModelJs2 = _interopRequireDefault(_vendorJsModelJs);
 	
-	var _microeventMicroevent = __webpack_require__(166);
+	var _persistenceJs = __webpack_require__(166);
+	
+	var _persistenceJs2 = _interopRequireDefault(_persistenceJs);
+	
+	var _microeventMicroevent = __webpack_require__(177);
 	
 	var _microeventMicroevent2 = _interopRequireDefault(_microeventMicroevent);
 	
@@ -21340,30 +21367,28 @@
 	
 	var _dispatchersJs2 = _interopRequireDefault(_dispatchersJs);
 	
-	//import EndPoints from '../endpoints.js';
+	var _actionsJs = __webpack_require__(179);
 	
-	var _persistenceJs = __webpack_require__(168);
-	
-	var _persistenceJs2 = _interopRequireDefault(_persistenceJs);
+	var _actionsJs2 = _interopRequireDefault(_actionsJs);
 	
 	var Todo = (0, _vendorJsModelJs2['default'])('todo', function () {
-	    this.persistence(_persistenceJs2['default'], 'todos');
+	    this.persistence((0, _persistenceJs2['default'])('todos'));
 	});
 	
 	_dispatchersJs2['default'].register(function (payload) {
 	    console.log('TodoDispatcher: ', payload);
-	    if (payload.actionType == 'add') {
+	    if (payload.actionType == _actionsJs2['default'].ADD) {
 	        var todo = new Todo({ label: payload.label });
 	        todo.save();
-	    } else if (payload.actionType == 'delete') {
+	    } else if (payload.actionType == _actionsJs2['default'].REMOVE) {
 	        var todo = payload.todo;
 	        todo.destroy();
-	    } else if (payload.actionType == 'complete') {
+	    } else if (payload.actionType == _actionsJs2['default'].COMPLETE) {
 	        var todo = payload.todo,
 	            completed = payload.completed;
 	        todo.attr('completed', completed);
 	        todo.save();
-	    } else if (payload.actionType == 'set-label') {
+	    } else if (payload.actionType == _actionsJs2['default'].SET_LABEL) {
 	        var todo = payload.todo,
 	            label = payload.label;
 	        todo.attr('label', label);
@@ -21371,7 +21396,9 @@
 	    }
 	});
 	
+	/* cheat a bit.. */
 	var TodoStore = Todo;
+	
 	exports['default'] = TodoStore;
 	module.exports = exports['default'];
 
@@ -22106,79 +22133,6 @@
 /* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(module) {/**
-	 * MicroEvent - to make any js object an event emitter (server or browser)
-	 * 
-	 * - pure javascript - server compatible, browser compatible
-	 * - dont rely on the browser doms
-	 * - super simple - you get it immediatly, no mistery, no magic involved
-	 *
-	 * - create a MicroEventDebug with goodies to debug
-	 *   - make it safer to use
-	*/
-	
-	var MicroEvent	= function(){}
-	MicroEvent.prototype	= {
-		bind	: function(event, fct){
-			this._events = this._events || {};
-			this._events[event] = this._events[event]	|| [];
-			this._events[event].push(fct);
-		},
-		unbind	: function(event, fct){
-			this._events = this._events || {};
-			if( event in this._events === false  )	return;
-			this._events[event].splice(this._events[event].indexOf(fct), 1);
-		},
-		trigger	: function(event /* , args... */){
-			this._events = this._events || {};
-			if( event in this._events === false  )	return;
-			for(var i = 0; i < this._events[event].length; i++){
-				this._events[event][i].apply(this, Array.prototype.slice.call(arguments, 1))
-			}
-		}
-	};
-	
-	/**
-	 * mixin will delegate all MicroEvent.js function in the destination object
-	 *
-	 * - require('MicroEvent').mixin(Foobar) will make Foobar able to use MicroEvent
-	 *
-	 * @param {Object} the object which will support MicroEvent
-	*/
-	MicroEvent.mixin	= function(destObject){
-		var props	= ['bind', 'unbind', 'trigger'];
-		for(var i = 0; i < props.length; i ++){
-			destObject.prototype[props[i]]	= MicroEvent.prototype[props[i]];
-		}
-	}
-	
-	// export in common js
-	if( typeof module !== "undefined" && ('exports' in module)){
-		module.exports	= MicroEvent
-	}
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(167)(module)))
-
-/***/ },
-/* 167 */
-/***/ function(module, exports) {
-
-	module.exports = function(module) {
-		if(!module.webpackPolyfill) {
-			module.deprecate = function() {};
-			module.paths = [];
-			// module.parent = undefined by default
-			module.children = [];
-			module.webpackPolyfill = 1;
-		}
-		return module;
-	}
-
-
-/***/ },
-/* 168 */
-/***/ function(module, exports, __webpack_require__) {
-
 	'use strict';
 	
 	Object.defineProperty(exports, '__esModule', {
@@ -22195,25 +22149,9 @@
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _promise = __webpack_require__(169);
+	var _apiJs = __webpack_require__(167);
 	
-	var _promise2 = _interopRequireDefault(_promise);
-	
-	var Endpoints = new _promise2['default'](function (resolve, reject) {
-	    _jquery2['default'].ajax({ type: 'GET', url: '/api/', dataType: 'json' }).done(resolve).fail(reject);
-	});
-	
-	function getApiEndpoints() {
-	    return Endpoints;
-	}
-	
-	function getResourceEndpoint(resourceName) {
-	    return new _promise2['default'](function (resolve, reject) {
-	        Endpoints.then(function (endpoints) {
-	            resolve(endpoints[resourceName]);
-	        })['catch'](reject);
-	    });
-	}
+	/** A more restful interface/adapter for the js-model lib. */
 	
 	var RestfulInterface = (function () {
 	    function RestfulInterface(modelClass, resourceName) {
@@ -22224,55 +22162,30 @@
 	        this.modelClass.persistence = this;
 	    }
 	
+	    /** Adapter factory function.
+	     *
+	     * example:
+	     *     var Item = Model('item', function() {
+	     *         this.persistence(RestfulAdapter('items'));
+	     *     });
+	     */
+	
+	    /** Return true if given model instance is a new record, otherwise false. */
+	
 	    _createClass(RestfulInterface, [{
 	        key: 'newRecord',
 	        value: function newRecord(model) {
 	            console.log('RestfulInterface.newRecord');
 	            return !model.id();
 	        }
-	    }, {
-	        key: 'create',
-	        value: function create(model, callback) {
-	            console.log('RestfulInterface.create');
-	            var data = this.serialize(model);
-	            getResourceEndpoint(this.resourceName).then(function (endpoint) {
-	                _jquery2['default'].ajax({
-	                    url: endpoint,
-	                    type: 'POST',
-	                    dataType: 'json',
-	                    contentType: 'application/json',
-	                    data: data
-	                }).done(function (data, textStatus, xhr) {
-	                    model.attr(xhr.responseJSON);
-	                    callback(true);
-	                }).fail(function () {
-	                    callback(false);
-	                });
-	            });
-	        }
-	    }, {
-	        key: 'update',
-	        value: function update(model, callback) {
-	            console.log('RestfulInterface.update');
-	            _jquery2['default'].ajax({
-	                url: model.attr('url'),
-	                type: 'PUT',
-	                dataType: 'json',
-	                contentType: 'application/json',
-	                data: this.serialize(model)
-	            }).done(function (data, textStatus, xhr) {
-	                model.attr(xhr.responseJSON);
-	                callback(true);
-	            }).fail(function () {
-	                callback(false);
-	            });
-	        }
+	
+	        /** Retrieve records from server, create models, pass them to callback. */
 	    }, {
 	        key: 'read',
 	        value: function read(callback) {
 	            console.log('RestfulInterface.read');
 	            var modelClass = this.modelClass;
-	            getResourceEndpoint(this.resourceName).then(function (endpoint) {
+	            (0, _apiJs.getResourceEndpoint)(this.resourceName).then(function (endpoint) {
 	                _jquery2['default'].ajax({ url: endpoint, type: 'GET', dataType: 'json' }).done(function (response) {
 	                    var models = [];
 	                    var _iteratorNormalCompletion = true;
@@ -22304,16 +22217,49 @@
 	                });
 	            });
 	        }
+	
+	        /** Persist a new record. */
 	    }, {
-	        key: 'save',
-	        value: function save(model, callback) {
-	            console.log('RestfulInterface.save');
-	            if (this.newRecord(model)) {
-	                this.create(model, callback);
-	            } else {
-	                this.update(model, callback);
-	            }
+	        key: 'create',
+	        value: function create(model, callback) {
+	            console.log('RestfulInterface.create');
+	            var data = this.serialize(model);
+	            (0, _apiJs.getResourceEndpoint)(this.resourceName).then(function (endpoint) {
+	                _jquery2['default'].ajax({
+	                    url: endpoint,
+	                    type: 'POST',
+	                    dataType: 'json',
+	                    contentType: 'application/json',
+	                    data: data
+	                }).done(function (data, textStatus, xhr) {
+	                    model.attr(xhr.responseJSON);
+	                    callback(true);
+	                }).fail(function () {
+	                    callback(false);
+	                });
+	            });
 	        }
+	
+	        /** Persist an existing record. */
+	    }, {
+	        key: 'update',
+	        value: function update(model, callback) {
+	            console.log('RestfulInterface.update');
+	            _jquery2['default'].ajax({
+	                url: model.attr('url'),
+	                type: 'PUT',
+	                dataType: 'json',
+	                contentType: 'application/json',
+	                data: this.serialize(model)
+	            }).done(function (data, textStatus, xhr) {
+	                model.attr(xhr.responseJSON);
+	                callback(true);
+	            }).fail(function () {
+	                callback(false);
+	            });
+	        }
+	
+	        /** Delete a record. */
 	    }, {
 	        key: 'destroy',
 	        value: function destroy(model, callback) {
@@ -22334,6 +22280,8 @@
 	                });
 	            }
 	        }
+	
+	        /** Serialize model json to string. */
 	    }, {
 	        key: 'serialize',
 	        value: function serialize(model) {
@@ -22344,12 +22292,75 @@
 	    return RestfulInterface;
 	})();
 	
-	function RestfulAdapter(modelClass, resourceName) {
-	    return new RestfulInterface(modelClass, resourceName);
+	function RestfulAdapter(resourceName) {
+	    return function (modelClass) {
+	        return new RestfulInterface(modelClass, resourceName);
+	    };
 	}
 	
 	exports['default'] = RestfulAdapter;
 	module.exports = exports['default'];
+
+/***/ },
+/* 167 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports.getApiEndpoints = getApiEndpoints;
+	exports.getResourceEndpoint = getResourceEndpoint;
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _jquery = __webpack_require__(1);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	var _promise = __webpack_require__(168);
+	
+	var _promise2 = _interopRequireDefault(_promise);
+	
+	/** Root api endpoint url. */
+	var API_ENDPOINT = '/api/';
+	
+	/** Promise that resolves to list of API endpoint urls.
+	 *
+	 * This will basically fire off request to get list of endpoints
+	 * a soon as the app bundle loads. This promise is then used
+	 * transparently so endpoints can be queried without further
+	 * requests to api.
+	 */
+	var Endpoints = new _promise2['default'](function (resolve, reject) {
+	    _jquery2['default'].ajax({ type: 'GET', url: API_ENDPOINT, dataType: 'json' }).done(resolve).fail(reject);
+	});
+	
+	/** Simply a proxy function returning the above EndPoints promise. */
+	
+	function getApiEndpoints() {
+	    return Endpoints;
+	}
+	
+	/** Get endpoint url for a resource. */
+	
+	function getResourceEndpoint(resourceName) {
+	    return new _promise2['default'](function (resolve, reject) {
+	        getApiEndpoints().then(function (endpoints) {
+	            resolve(endpoints[resourceName]);
+	        })['catch'](reject);
+	    });
+	}
+
+/***/ },
+/* 168 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	module.exports = __webpack_require__(169)
+
 
 /***/ },
 /* 169 */
@@ -22357,7 +22368,11 @@
 
 	'use strict';
 	
-	module.exports = __webpack_require__(170)
+	module.exports = __webpack_require__(170);
+	__webpack_require__(172);
+	__webpack_require__(173);
+	__webpack_require__(174);
+	__webpack_require__(175);
 
 
 /***/ },
@@ -22366,20 +22381,7 @@
 
 	'use strict';
 	
-	module.exports = __webpack_require__(171);
-	__webpack_require__(173);
-	__webpack_require__(174);
-	__webpack_require__(175);
-	__webpack_require__(176);
-
-
-/***/ },
-/* 171 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var asap = __webpack_require__(172);
+	var asap = __webpack_require__(171);
 	
 	function noop() {}
 	
@@ -22564,7 +22566,7 @@
 
 
 /***/ },
-/* 172 */
+/* 171 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {"use strict";
@@ -22791,12 +22793,12 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 173 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var Promise = __webpack_require__(171);
+	var Promise = __webpack_require__(170);
 	
 	module.exports = Promise;
 	Promise.prototype.done = function (onFulfilled, onRejected) {
@@ -22810,12 +22812,12 @@
 
 
 /***/ },
-/* 174 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var Promise = __webpack_require__(171);
+	var Promise = __webpack_require__(170);
 	
 	module.exports = Promise;
 	Promise.prototype['finally'] = function (f) {
@@ -22832,14 +22834,14 @@
 
 
 /***/ },
-/* 175 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	//This file contains the ES6 extensions to the core Promises/A+ API
 	
-	var Promise = __webpack_require__(171);
+	var Promise = __webpack_require__(170);
 	
 	module.exports = Promise;
 	
@@ -22945,7 +22947,7 @@
 
 
 /***/ },
-/* 176 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22953,8 +22955,8 @@
 	// This file contains then/promise specific extensions that are only useful
 	// for node.js interop
 	
-	var Promise = __webpack_require__(171);
-	var asap = __webpack_require__(177);
+	var Promise = __webpack_require__(170);
+	var asap = __webpack_require__(176);
 	
 	module.exports = Promise;
 	
@@ -23022,13 +23024,13 @@
 
 
 /***/ },
-/* 177 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	// rawAsap provides everything we need except exception management.
-	var rawAsap = __webpack_require__(172);
+	var rawAsap = __webpack_require__(171);
 	// RawTasks are recycled to reduce GC churn.
 	var freeTasks = [];
 	// We queue errors to ensure they are thrown in right order (FIFO).
@@ -23094,7 +23096,80 @@
 
 
 /***/ },
+/* 177 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(module) {/**
+	 * MicroEvent - to make any js object an event emitter (server or browser)
+	 * 
+	 * - pure javascript - server compatible, browser compatible
+	 * - dont rely on the browser doms
+	 * - super simple - you get it immediatly, no mistery, no magic involved
+	 *
+	 * - create a MicroEventDebug with goodies to debug
+	 *   - make it safer to use
+	*/
+	
+	var MicroEvent	= function(){}
+	MicroEvent.prototype	= {
+		bind	: function(event, fct){
+			this._events = this._events || {};
+			this._events[event] = this._events[event]	|| [];
+			this._events[event].push(fct);
+		},
+		unbind	: function(event, fct){
+			this._events = this._events || {};
+			if( event in this._events === false  )	return;
+			this._events[event].splice(this._events[event].indexOf(fct), 1);
+		},
+		trigger	: function(event /* , args... */){
+			this._events = this._events || {};
+			if( event in this._events === false  )	return;
+			for(var i = 0; i < this._events[event].length; i++){
+				this._events[event][i].apply(this, Array.prototype.slice.call(arguments, 1))
+			}
+		}
+	};
+	
+	/**
+	 * mixin will delegate all MicroEvent.js function in the destination object
+	 *
+	 * - require('MicroEvent').mixin(Foobar) will make Foobar able to use MicroEvent
+	 *
+	 * @param {Object} the object which will support MicroEvent
+	*/
+	MicroEvent.mixin	= function(destObject){
+		var props	= ['bind', 'unbind', 'trigger'];
+		for(var i = 0; i < props.length; i ++){
+			destObject.prototype[props[i]]	= MicroEvent.prototype[props[i]];
+		}
+	}
+	
+	// export in common js
+	if( typeof module !== "undefined" && ('exports' in module)){
+		module.exports	= MicroEvent
+	}
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(178)(module)))
+
+/***/ },
 /* 178 */
+/***/ function(module, exports) {
+
+	module.exports = function(module) {
+		if(!module.webpackPolyfill) {
+			module.deprecate = function() {};
+			module.paths = [];
+			// module.parent = undefined by default
+			module.children = [];
+			module.webpackPolyfill = 1;
+		}
+		return module;
+	}
+
+
+/***/ },
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23110,23 +23185,28 @@
 	var _dispatchersJs2 = _interopRequireDefault(_dispatchersJs);
 	
 	var TodoActions = {
+	    ADD: 1,
+	    REMOVE: 2,
+	    COMPLETE: 3,
+	    SET_LABEL: 4,
+	
 	    add: function add(label) {
 	        _dispatchersJs2['default'].dispatch({
-	            actionType: 'add',
+	            actionType: TodoActions.ADD,
 	            label: label
 	        });
 	    },
 	
 	    remove: function remove(todo) {
 	        _dispatchersJs2['default'].dispatch({
-	            actionType: 'delete',
+	            actionType: TodoActions.REMOVE,
 	            todo: todo
 	        });
 	    },
 	
 	    complete: function complete(todo, completed) {
 	        _dispatchersJs2['default'].dispatch({
-	            actionType: 'complete',
+	            actionType: TodoActions.COMPLETE,
 	            todo: todo,
 	            completed: completed
 	        });
@@ -23134,7 +23214,7 @@
 	
 	    setLabel: function setLabel(todo, label) {
 	        _dispatchersJs2['default'].dispatch({
-	            actionType: 'set-label',
+	            actionType: TodoActions.SET_LABEL,
 	            todo: todo,
 	            label: label
 	        });
