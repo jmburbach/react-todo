@@ -96,9 +96,18 @@ class TodoItemCheck extends BaseComponent {
         TodoActions.complete(this.props.todo, event.target.checked);
     }
 
+    onClick() {
+        var completed = !this.props.todo.get('completed');
+        TodoActions.complete(this.props.todo, completed);
+    }
+
     render() {
         var checked = this.props.todo.get('completed');
-        return <input className="todo-check" type='checkbox' onChange={this.onChange} checked={checked} />;
+        return (
+            <span onClick={this.onClick} className="todo-check" data-checked={checked}>
+                <input className="todo-check" type='checkbox' onChange={this.onChange} checked={checked} />
+            </span>
+        );
     }
 }
 
@@ -184,7 +193,7 @@ class TodoItemRemove extends BaseComponent {
 
     render() {
         return (
-            <a onClick={this.onClick} className="pull-right text-danger" href="#">
+            <a onClick={this.onClick} className="pull-right text-danger todo-remove" href="#">
                 <span className="glyphicon glyphicon-remove"></span>
             </a>
         );
@@ -207,14 +216,20 @@ class TodoForm extends BaseComponent {
         TodoActions.add(labelValue);
     }
 
+    componentDidMount() {
+        setTimeout(function() {
+            var e = React.findDOMNode(this.refs.label);
+            e.select();
+            e.focus();
+        }.bind(this), 0);
+    }
+
     render() {
         return (
             <form className="todo-form" onSubmit={this.handleSubmit}>
-                <div className="input-group">
+                <div className="form-group">
+                    <label for="todo-form-input" className="sr-only">Label</label>
                     <input className="form-control" type="text" ref="label" placeholder="I need to..." />
-                    <span className="input-group-btn">
-                        <button className="btn btn-primary" type="submit">Add</button>
-                    </span>
                 </div>
             </form>
         );

@@ -18,8 +18,8 @@ module.exports = function(grunt) {
         watch: {
             app: {
                 files: [
-                    'todo/static/js/src/**/*.js',
-                    'todo/static/js/src/**/*.jsx'
+                    'src/**/*.js',
+                    'src/**/*.jsx'
                 ],
                 tasks: ['webpack:build'],
                 options: {

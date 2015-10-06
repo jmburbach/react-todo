@@ -20798,10 +20798,20 @@
 	            _actionsJs2['default'].complete(this.props.todo, event.target.checked);
 	        }
 	    }, {
+	        key: 'onClick',
+	        value: function onClick() {
+	            var completed = !this.props.todo.get('completed');
+	            _actionsJs2['default'].complete(this.props.todo, completed);
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var checked = this.props.todo.get('completed');
-	            return _reactReact2['default'].createElement('input', { className: 'todo-check', type: 'checkbox', onChange: this.onChange, checked: checked });
+	            return _reactReact2['default'].createElement(
+	                'span',
+	                { onClick: this.onClick, className: 'todo-check', 'data-checked': checked },
+	                _reactReact2['default'].createElement('input', { className: 'todo-check', type: 'checkbox', onChange: this.onChange, checked: checked })
+	            );
 	        }
 	    }]);
 	
@@ -20920,7 +20930,7 @@
 	        value: function render() {
 	            return _reactReact2['default'].createElement(
 	                'a',
-	                { onClick: this.onClick, className: 'pull-right text-danger', href: '#' },
+	                { onClick: this.onClick, className: 'pull-right text-danger todo-remove', href: '#' },
 	                _reactReact2['default'].createElement('span', { className: 'glyphicon glyphicon-remove' })
 	            );
 	        }
@@ -20955,6 +20965,15 @@
 	            _actionsJs2['default'].add(labelValue);
 	        }
 	    }, {
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            setTimeout((function () {
+	                var e = _reactReact2['default'].findDOMNode(this.refs.label);
+	                e.select();
+	                e.focus();
+	            }).bind(this), 0);
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            return _reactReact2['default'].createElement(
@@ -20962,17 +20981,13 @@
 	                { className: 'todo-form', onSubmit: this.handleSubmit },
 	                _reactReact2['default'].createElement(
 	                    'div',
-	                    { className: 'input-group' },
-	                    _reactReact2['default'].createElement('input', { className: 'form-control', type: 'text', ref: 'label', placeholder: 'I need to...' }),
+	                    { className: 'form-group' },
 	                    _reactReact2['default'].createElement(
-	                        'span',
-	                        { className: 'input-group-btn' },
-	                        _reactReact2['default'].createElement(
-	                            'button',
-	                            { className: 'btn btn-primary', type: 'submit' },
-	                            'Add'
-	                        )
-	                    )
+	                        'label',
+	                        { 'for': 'todo-form-input', className: 'sr-only' },
+	                        'Label'
+	                    ),
+	                    _reactReact2['default'].createElement('input', { className: 'form-control', type: 'text', ref: 'label', placeholder: 'I need to...' })
 	                )
 	            );
 	        }
