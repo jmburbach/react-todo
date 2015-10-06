@@ -1,35 +1,32 @@
-import $ from 'jquery';
 import React from 'react/react';
+
+import BaseComponent from '../components.js';
+
 import TodoDispatcher from './dispatchers.js'
 import TodoStore from './stores.js';
 import TodoActions from './actions.js';
 
 
-class TodoBox extends React.Component {
+class TodoBox extends BaseComponent {
     constructor(props) {
         super(props);
         this.state = {todos: []};
-        this.componentDidMount = this.componentDidMount.bind(this);
-        this.componentWillUnmount = this.componentWillUnmount.bind(this);
-        this.onChange = this.onChange.bind(this);
     }
 
     componentDidMount() {
-        TodoStore.bind('add', this.onChange);
-        TodoStore.bind('remove', this.onChange);
-        TodoStore.load();
+        TodoStore.on('add remove', this.onChange);
+        TodoStore.fetch();
     }
 
     componentWillUnmount() {
-        TodoStore.unbind('add', this.onChange);
-        TodoStore.unbind('remove', this.onChange);
+        TodoStore.off('update', this.onChange);
     }
 
     onChange() {
-        console.log('onChange');
-        this.setState({todos: TodoStore.all()});
+        console.log('onChange', name);
+        this.setState({todos: TodoStore.models});
     }
-    
+
     render() {
         return (
             <div className="todo-box">
@@ -45,11 +42,11 @@ class TodoBox extends React.Component {
 }
 
 
-class TodoList extends React.Component {
+class TodoList extends BaseComponent {
     render() {
         var todoItems = [];
         for (let todo of this.props.todos) {
-            todoItems.push(<TodoItem key={todo.id()} todo={todo} />);
+            todoItems.push(<TodoItem key={todo.cid} todo={todo} />);
         }
         return (
             <ul className="todo-list">
@@ -60,40 +57,31 @@ class TodoList extends React.Component {
 }
 
 
-class TodoItem extends React.Component {
+class TodoItem extends BaseComponent {
     constructor(props) {
         super(props);
         this.state = {todo: this.props.todo};
-        this.onRemove = this.onRemove.bind(this);
-        this.onUpdate = this.onUpdate.bind(this);
-        this.componentDidMount = this.componentDidMount.bind(this);
-        this.componentWillUnmount = this.componentWillUnmount.bind(this);
     }
 
     componentDidMount() {
-        this.state.todo.bind('update', this.onUpdate);
+        this.state.todo.on('sync', this.onUpdate);
     }
 
     componentWillUnmount() {
-        this.state.todo.unbind('update', this.onUpdate);
+        this.state.todo.off('sync', this.onUpdate);
     }
 
     onUpdate() {
+        console.log('TodoItem.onUpdate');
         this.setState({todo: this.state.todo});
-    }
-
-    onRemove(event) {
-        console.log('handleRemove');
-        event.preventDefault();
-        TodoActions.remove(this.props.todo);
     }
 
     render() {
         var todo = this.props.todo;
         return (
-            <li className={todo.attr('completed') ? 'bg-success complete' : ''}>
+            <li className={todo.get('completed') ? 'bg-success complete' : ''}>
                 <div className="todo-item">
-                    <TodoItemCheck todo={todo} /> 
+                    <TodoItemCheck todo={todo} />
                     <TodoItemLabel todo={todo} />
                     <TodoItemRemove todo={todo} />
                 </div>
@@ -103,42 +91,33 @@ class TodoItem extends React.Component {
 }
 
 
-class TodoItemCheck extends React.Component {
-    constructor(props) {
-        super(props);
-        this.onChange = this.onChange.bind(this);
-    }
-
+class TodoItemCheck extends BaseComponent {
     onChange(event) {
         TodoActions.complete(this.props.todo, event.target.checked);
     }
 
     render() {
-        var checked = this.props.todo.attr('completed');
+        var checked = this.props.todo.get('completed');
         return <input className="todo-check" type='checkbox' onChange={this.onChange} checked={checked} />;
     }
 }
 
 
-class TodoItemLabel extends React.Component {
+class TodoItemLabel extends BaseComponent {
     constructor(props) {
         super(props);
         this.state = {editing: false};
-        this.onSubmit = this.onSubmit.bind(this);
-        this.onDoubleClick = this.onDoubleClick.bind(this);
-        this.onBlur = this.onBlur.bind(this);
-        this.onKeyDown = this.onKeyDown.bind(this);
     }
 
     onSubmit(event) {
         event.preventDefault();
         var label = React.findDOMNode(this.refs.label).value.trim();
-        if (label && label != this.props.todo.attr('label')) {
+        if (label && label != this.props.todo.get('label')) {
             TodoActions.setLabel(this.props.todo, label);
         }
         this.stopEditing();
     }
-    
+
     onDoubleClick(event) {
         console.log('TodoItemLabel.onClick');
         this.setState({editing: true});
@@ -164,7 +143,7 @@ class TodoItemLabel extends React.Component {
 
     cancelEditing() {
         /* throw away any input and reset */
-        React.findDOMNode(this.refs.label).value = this.props.todo.attr('label');
+        React.findDOMNode(this.refs.label).value = this.props.todo.get('label');
         this.stopEditing();
     }
 
@@ -185,11 +164,11 @@ class TodoItemLabel extends React.Component {
                 <form style={{display: this.state.editing ? 'inline' : 'none'}}
                          autofocus onSubmit={this.onSubmit} className='todo-label'>
                     <input onBlur={this.onBlur} onKeyDown={this.onKeyDown} ref='label'
-                         defaultValue={this.props.todo.attr('label')} />
+                         defaultValue={this.props.todo.get('label')} />
                 </form>
                 <p style={{display: this.state.editing ? 'none' : 'inline'}}
                          className="todo-label" onDoubleClick={this.onDoubleClick}>
-                    {this.props.todo.attr('label')}
+                    {this.props.todo.get('label')}
                 </p>
             </span>
         );
@@ -197,12 +176,7 @@ class TodoItemLabel extends React.Component {
 }
 
 
-class TodoItemRemove extends React.Component {
-    constructor(props) {
-        super(props);
-        this.onClick = this.onClick.bind(this);
-    }
-
+class TodoItemRemove extends BaseComponent {
     onClick(event) {
         event.preventDefault();
         TodoActions.remove(this.props.todo);
@@ -217,13 +191,7 @@ class TodoItemRemove extends React.Component {
     }
 }
 
-class TodoForm extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.handleSubmit = this.handleSubmit.bind(this);
-    }
-
+class TodoForm extends BaseComponent {
     handleSubmit(event) {
         event.preventDefault();
 

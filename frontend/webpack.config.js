@@ -1,7 +1,7 @@
 var fs = require('fs');
 var webpack = require('webpack');
 
-var cacheDirectory = './.build-cache';
+var cacheDirectory = './.build';
 var production = (process.env.NODE_ENV === 'production');
 var plugins = [];
 
@@ -16,14 +16,14 @@ if (!fs.existsSync(cacheDirectory)) {
 }
 
 module.exports = {
-    entry: './todo/static/js/src/main.js',
+    entry: './src/main.js',
     output: {
-        path: './todo/static/js/dist',
+        path: '../todo/static/js',
         filename: 'application-bundle.js'
     },
     module: {
         loaders: [{
-            test: /todo\/static\/js\/src\/.+.jsx?$/,
+            test: /src\/.+.jsx?$/,
             loader: 'babel-loader',
             query: {
                 cacheDirectory: cacheDirectory
