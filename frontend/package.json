@@ -9,6 +9,7 @@
   "author": "jacob burbach",
   "license": "public domain",
   "dependencies": {
+    "backbone": "^1.2.3",
     "flux": "^2.1.1",
     "js-cookie": "^2.0.3",
     "microevent": "^1.0.0",

@@ -89,6 +89,8 @@
 	 * Copyright 2006, 2015 Klaus Hartl & Fagner Brack
 	 * Released under the MIT license
 	 */
+	'use strict';
+	
 	(function (factory) {
 		if (true) {
 			!(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -102,12 +104,12 @@
 				return api;
 			};
 		}
-	}(function () {
-		function extend () {
+	})(function () {
+		function extend() {
 			var i = 0;
 			var result = {};
 			for (; i < arguments.length; i++) {
-				var attributes = arguments[ i ];
+				var attributes = arguments[i];
 				for (var key in attributes) {
 					result[key] = attributes[key];
 				}
@@ -115,8 +117,8 @@
 			return result;
 		}
 	
-		function init (converter) {
-			function api (key, value, attributes) {
+		function init(converter) {
+			function api(key, value, attributes) {
 				var result;
 	
 				// Write
@@ -146,13 +148,8 @@
 					key = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent);
 					key = key.replace(/[\(\)]/g, escape);
 	
-					return (document.cookie = [
-						key, '=', value,
-						attributes.expires && '; expires=' + attributes.expires.toUTCString(), // use expires attribute, max-age is not supported by IE
-						attributes.path    && '; path=' + attributes.path,
-						attributes.domain  && '; domain=' + attributes.domain,
-						attributes.secure ? '; secure' : ''
-					].join(''));
+					return document.cookie = [key, '=', value, attributes.expires && '; expires=' + attributes.expires.toUTCString(), // use expires attribute, max-age is not supported by IE
+					attributes.path && '; path=' + attributes.path, attributes.domain && '; domain=' + attributes.domain, attributes.secure ? '; secure' : ''].join('');
 				}
 	
 				// Read
@@ -220,8 +217,7 @@
 		}
 	
 		return init();
-	}));
-
+	});
 
 /***/ },
 /* 3 */

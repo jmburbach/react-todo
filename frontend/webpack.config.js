@@ -18,7 +18,7 @@ if (!fs.existsSync(cacheDirectory)) {
 module.exports = {
     entry: './src/main.js',
     output: {
-        path: '../todo/static/js',
+        path: '../backend/todo/static/js',
         filename: 'application-bundle.js'
     },
     module: {
