@@ -20654,7 +20654,7 @@
 	    }, {
 	        key: 'componentWillUnmount',
 	        value: function componentWillUnmount() {
-	            _storesJs2['default'].off('update', this.onChange);
+	            _storesJs2['default'].off('add remove', this.onChange);
 	        }
 	    }, {
 	        key: 'onChange',

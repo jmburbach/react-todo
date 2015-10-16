@@ -1,7 +1,16 @@
+body {
+  background-color: #fafafa;
+}
+
 div.todo-box {
   margin: 0 auto;
   width: 65%;
   display: block;
+  padding: 1em;
+  margin-top: 2em;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 0 8px #ddd;
 }
 
 h2.page-header {
@@ -17,6 +26,7 @@ form.todo-form {
 ul.todo-list {
   padding-left: 0;
   list-style-type: none;
+  margin-bottom: 2em;
 }
 
 ul.todo-list li {
@@ -36,6 +46,11 @@ ul.todo-list div.todo-item {
 
 ul.todo-list form.todo-label {
   display: inline-block;
+}
+
+ul.todo-list .todo-label {
+  font-family: 'Delius', cursive;
+  font-size: 18px;
 }
 
 ul.todo-list form.todo-label input,
@@ -59,8 +74,6 @@ ul.todo-list p.todo-label {
   -moz-user-select: none;
   -ms-user-select: none; 
   user-select: none;
-  font-family: 'Delius', cursive;
-  font-size: 16px;
 }
 
 ul.todo-list li.complete p.todo-label {
@@ -70,7 +83,8 @@ ul.todo-list li.complete p.todo-label {
 ul.todo-list li span.todo-check {
   margin-right: 1em;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 22px;
+  font-weight: bold;
 }
 
 ul.todo-list li span.todo-check:before {
@@ -83,11 +97,14 @@ ul.todo-list li.complete span.todo-check:before {
 
 ul.todo-list li a.todo-remove {
   opacity: 0;
+  position: relative;
+  top: 4px;
   transition: all 0.75s;
 }
 
 ul.todo-list li:hover a.todo-remove {
   opacity: 1;
+  font-size: 18px;
 }
 
 form.todo-form input.form-control {

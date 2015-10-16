@@ -19,7 +19,7 @@ class TodoBox extends BaseComponent {
     }
 
     componentWillUnmount() {
-        TodoStore.off('update', this.onChange);
+        TodoStore.off('add remove', this.onChange);
     }
 
     onChange() {
